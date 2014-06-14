@@ -1,0 +1,4 @@
+true: use_menhir
+true: package(core)
+true: thread
+"src/parser.mly": token_base, ext_tokens, use_tokens
