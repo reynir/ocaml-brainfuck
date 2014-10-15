@@ -17,16 +17,15 @@ let parse_with_error (type s) (module S : Bf.SYNTAX with type t = s) lexbuf =
 
 let () =
   let minified =
-    let module M = Bf.Syntax in
     let lexbuf = Lexing.from_channel stdin in
-    parse_with_error (module M) lexbuf
+    parse_with_error (module Bf.Syntax) lexbuf
     |> Bf.string_of_syntax in
-  let module M = Bf.RunnableSyntax(Bf.ExampleState) in
+  let module Run = Bf.RunnableSyntax(Bf.ExampleState) in
   let runnable =
     let lexbuf = Lexing.from_string minified in
-    parse_with_error (module M) lexbuf in
+    parse_with_error (module Run) lexbuf in
   print_endline "Minified:";
   print_endline minified;
   print_endline "Running program...";
-  M.run runnable Bf.ExampleState.empty
+  Run.run runnable Bf.ExampleState.empty
   |> ignore
