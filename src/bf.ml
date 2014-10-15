@@ -1,5 +1,3 @@
-open Core.Std
-
 (* State *)
 
 module type STATE =
