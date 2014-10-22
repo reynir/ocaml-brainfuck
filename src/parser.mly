@@ -1,8 +1,4 @@
-%{
-  open Syntax
-%}
-
-%parameter < Syntax : Bf.SYNTAX >
+%parameter < S : Bf.SYNTAX >
 
 %token EOF
 %token PLUS
@@ -14,24 +10,25 @@
 %token L_BRACKET
 %token R_BRACKET
        
-%start <Syntax.t> program
+%start <S.t> program
 
-%type <Syntax.t -> Syntax.t> single
+%type <S.t -> S.t> body
+%type <S.t -> S.t> single
 
 %%
 
 program :
-| p=body EOF { p bf_end }
+| p=body EOF { p S.bf_end }
 
 body :
 | s=single b=body { fun k -> s (b k) }
 | { fun k -> k }
 
 single :
-| PLUS { bf_inc }
-| MINUS { bf_dec }
-| LT { bf_left }
-| GT { bf_right }
-| COMMA { bf_input }
-| DOT { bf_output }
-| L_BRACKET b=body R_BRACKET { bf_loop (b bf_end) }
+| PLUS { S.bf_inc }
+| MINUS { S.bf_dec }
+| LT { S.bf_left }
+| GT { S.bf_right }
+| COMMA { S.bf_input }
+| DOT { S.bf_output }
+| L_BRACKET b=body R_BRACKET { S.bf_loop (b S.bf_end) }
