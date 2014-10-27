@@ -12,23 +12,23 @@
        
 %start <S.t> program
 
-%type <S.t -> S.t> body
+%type <S.t> body
 %type <S.t -> S.t> single
 
 %%
 
 program :
-| p=body EOF { p S.bf_end }
+| p=body EOF { p }
 
 body :
-| s=single b=body { fun k -> s (b k) }
-| { fun k -> k }
+| s=single b=body { s b }
+| { S.stop }
 
 single :
-| PLUS { S.bf_inc }
-| MINUS { S.bf_dec }
-| LT { S.bf_left }
-| GT { S.bf_right }
-| COMMA { S.bf_input }
-| DOT { S.bf_output }
-| L_BRACKET b=body R_BRACKET { S.bf_loop (b S.bf_end) }
+| PLUS { S.inc }
+| MINUS { S.dec }
+| LT { S.left }
+| GT { S.right }
+| COMMA { S.input }
+| DOT { S.output }
+| L_BRACKET b=body R_BRACKET { S.loop b }

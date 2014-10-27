@@ -1,3 +1,5 @@
 true: use_menhir
 true: thread
-"src/parser.mly": token_base, ext_tokens, use_tokens
+true: annot
+<src>: include
+<tests/*>: package(qcheck)

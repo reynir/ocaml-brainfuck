@@ -59,14 +59,14 @@ module ExampleState =
 module type SYNTAX =
   sig
     type t
-    val bf_end : t
-    val bf_inc : t -> t
-    val bf_dec : t -> t
-    val bf_left : t -> t
-    val bf_right : t -> t
-    val bf_input : t -> t
-    val bf_output : t -> t
-    val bf_loop : t -> t -> t
+    val stop : t
+    val inc : t -> t
+    val dec : t -> t
+    val left : t -> t
+    val right : t -> t
+    val input : t -> t
+    val output : t -> t
+    val loop : t -> t -> t
   end
 
 module Syntax =
@@ -81,14 +81,14 @@ module Syntax =
       | Output of t
       | Loop of t * t
     (* Damnit, OCaml! *)
-    let bf_end = End
-    let bf_inc k = Inc k
-    let bf_dec k = Dec k
-    let bf_left k = Left k
-    let bf_right k = Right k
-    let bf_input k = Input k
-    let bf_output k = Output k
-    let bf_loop b k = Loop (b, k)
+    let stop = End
+    let inc k = Inc k
+    let dec k = Dec k
+    let left k = Left k
+    let right k = Right k
+    let input k = Input k
+    let output k = Output k
+    let loop b k = Loop (b, k)
   end
     
 let rec string_of_syntax s =
@@ -103,42 +103,58 @@ let rec string_of_syntax s =
   | Output k -> "." ^ string_of_syntax k
   | Loop (b, k) -> "[" ^ string_of_syntax b ^ "]" ^ string_of_syntax k
 
+let transform_syntax (type s) (module S : SYNTAX with type t = s)
+    : Syntax.t -> S.t =
+  let rec transform (s : Syntax.t) : S.t =
+    match s with
+    | Syntax.End -> S.stop
+    | Syntax.Inc s' -> S.inc (transform s')
+    | Syntax.Dec s' -> S.dec (transform s')
+    | Syntax.Left s' -> S.left (transform s')
+    | Syntax.Right s' -> S.right (transform s')
+    | Syntax.Input s' -> S.input (transform s')
+    | Syntax.Output s' -> S.output (transform s')
+    | Syntax.Loop (b, s') -> S.loop (transform b) (transform s')
+  in transform
+
 module RunnableSyntax (State : STATE) :
 sig
   include SYNTAX
   val run : t -> State.t -> State.t
+  val of_syntax : Syntax.t -> t
 end
   =
   struct
-    open State
+    (* Wrap the [SYNTAX] parts in a module so we can use [transform_syntax] *)
+    module S = struct
+      type t = State.t -> State.t
+      let stop s = s
+      and inc k s = k (State.increment s)
+      and dec k s = k (State.decrement s)
+      and left k s = k (State.left s)
+      and right k s = k (State.right s)
+      and input k s = k (State.input s)
+      and output k s = k (State.output s)
+      and loop b k =
+        let rec loop s =
+          if not (State.is_zero s)
+          then loop (b s)
+          else k s
+        in loop
+    end
+    include S
 
-    type t = State.t -> State.t
+    let run = (@@)
 
-    let bf_end s = s
-    and bf_inc k s = k (increment s)
-    and bf_dec k s = k (decrement s)
-    and bf_left k s = k (left s)
-    and bf_right k s = k (right s)
-    and bf_input k s = k (input s)
-    and bf_output k s = k (output s)
-    and bf_loop b k =
-      let rec loop s =
-        if not (is_zero s)
-        then loop (b s)
-        else k s
-      in loop
-
-    and run = (@@)
+    let of_syntax = transform_syntax (module S)
   end
 
-
 let test () =
-  let module BF = RunnableSyntax(ExampleState) in
-  let open BF in
+  let module S = RunnableSyntax(ExampleState) in
   let hello =
-    bf_inc
-    @@ bf_loop
-         (bf_output @@ bf_inc bf_end)
-         bf_end
-  in run hello ExampleState.empty
+    S.(inc
+        @@ loop
+             (output @@ inc stop)
+             stop)
+  in S.run hello ExampleState.empty
      |> ignore
