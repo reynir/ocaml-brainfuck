@@ -1,4 +1,4 @@
-OCAMLBUILD=ocamlbuild -use-ocamlfind -menhir "menhir --external-tokens Tokens"
+OCAMLBUILD=ocamlbuild -use-ocamlfind
 
 all: ocaml_brainfuck.native test
 

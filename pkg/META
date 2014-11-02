@@ -1,0 +1,7 @@
+version = "0.1"
+description = "Brainfuck library"
+archive(byte) = "bf.cma utils.cma"
+archive(byte, plugin) = "bf.cma utils.cma"
+archive(native) = "bf.cmxa utils.cmxa"
+archive(native, plugin) = "bf.cmxs utils.cmxs"
+exists_if = "bf.cma utils.cma"
