@@ -1,9 +1,9 @@
 OCAMLBUILD=ocamlbuild -use-ocamlfind -menhir "menhir --external-tokens Tokens"
 
-all: main.native test
+all: ocaml_brainfuck.native test
 
-main.native: src/*
-	$(OCAMLBUILD) src/main.native
+ocaml_brainfuck.native: src/*
+	$(OCAMLBUILD) src/ocaml_brainfuck.native
 
 bf.native: src/bf.ml
 	$(OCAMLBUILD) src/bf.native
