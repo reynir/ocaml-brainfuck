@@ -3,6 +3,7 @@
 module type STATE =
   sig
     type t
+    val empty : t
     val increment : t -> t
     val decrement : t -> t
     val left : t -> t
