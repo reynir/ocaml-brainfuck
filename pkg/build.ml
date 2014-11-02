@@ -9,6 +9,6 @@ let () =
                  Pkg.lib ~exts:Exts.module_library "src/bf";
                  Pkg.lib ~exts:Exts.module_library "src/utils";
                  Pkg.lib ~exts:Exts.library "src/lexer";
-                 Pkg.lib ~exts:Exts.module_library "src/parser";
+                 Pkg.lib ~exts:Exts.library "src/parser";
                  Pkg.bin ~auto:true "src/ocaml_brainfuck";
                ]

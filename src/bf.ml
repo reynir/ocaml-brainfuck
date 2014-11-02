@@ -25,28 +25,26 @@ module ExampleState =
     let increment s = { s with curr = s.curr + 1 }
     and decrement s = { s with curr = s.curr - 1 }
     and left { left; curr; right } =
-      match left with
-      | new_curr :: new_left ->
-         { left = new_left;
-           curr = new_curr;
-           right = curr :: right }
-      | [] ->
-         { left = [];
-           curr = 0;
-           right = curr :: right }
+      let curr, left =
+        match left with
+          | [] -> 0, []
+          | new_curr :: new_left -> new_curr, new_left
+      and right = match curr, right with
+        | 0, [] -> []
+        | _ -> curr :: right
+      in { left; curr; right }
     and right { left; curr; right } =
-      match right with
-      | new_curr :: new_right ->
-         { left = curr :: left;
-           curr = new_curr;
-           right = new_right }
-      | [] ->
-         { left = curr :: left;
-           curr = 0;
-           right = [] }
+      let curr, right =
+        match right with
+          | [] -> 0, []
+          | new_curr :: new_right -> new_curr, new_right
+      and left = match curr, left with
+        | 0, [] -> []
+        | _ -> curr :: left
+      in { left; curr; right }
     and input s =
       let curr = try int_of_char (input_char stdin)
-                  with End_of_file -> -1
+                  with End_of_file -> 0
       in { s with curr }
     and output ({ curr; _ } as s) =
       print_char (char_of_int curr);
