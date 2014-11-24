@@ -27,8 +27,8 @@ module ExampleState =
     and left { left; curr; right } =
       let curr, left =
         match left with
-          | [] -> 0, []
-          | new_curr :: new_left -> new_curr, new_left
+        | [] -> 0, []
+        | new_curr :: new_left -> new_curr, new_left
       and right = match curr, right with
         | 0, [] -> []
         | _ -> curr :: right
@@ -36,15 +36,15 @@ module ExampleState =
     and right { left; curr; right } =
       let curr, right =
         match right with
-          | [] -> 0, []
-          | new_curr :: new_right -> new_curr, new_right
+        | [] -> 0, []
+        | new_curr :: new_right -> new_curr, new_right
       and left = match curr, left with
         | 0, [] -> []
         | _ -> curr :: left
       in { left; curr; right }
     and input s =
       let curr = try int_of_char (input_char stdin)
-                  with End_of_file -> 0
+                 with End_of_file -> 0
       in { s with curr }
     and output ({ curr; _ } as s) =
       print_char (char_of_int curr);
@@ -152,8 +152,8 @@ let test () =
   let module S = RunnableSyntax(ExampleState) in
   let hello =
     S.(inc
-        @@ loop
-             (output @@ inc stop)
-             stop)
+       @@ loop
+            (output @@ inc stop)
+            stop)
   in S.run hello ExampleState.empty
      |> ignore
